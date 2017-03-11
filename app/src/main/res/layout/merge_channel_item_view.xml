@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:orientation="vertical">
+
+<TextView
+    style="@style/Channels.Name"
+android:id="@+id/channel_title"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"/>
+
+<ImageView
+
+    android:visibility="gone"
+android:id="@+id/lock_icon"
+android:layout_width="@dimen/channel_item_lock_icon_size"
+android:layout_height="@dimen/channel_item_lock_icon_size"
+android:src="@drawable/ic_lock_white"/>
+
+</LinearLayout>
