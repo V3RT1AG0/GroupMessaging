@@ -1,15 +1,22 @@
 package com.novoda.v3rt1ag0.chat;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,6 +28,8 @@ import com.novoda.v3rt1ag0.Dependencies;
 import com.novoda.v3rt1ag0.R;
 import com.novoda.v3rt1ag0.channel.data.model.Channel;
 import com.novoda.v3rt1ag0.chat.Model.AdminMode;
+import com.novoda.v3rt1ag0.chat.Model.Note;
+import com.novoda.v3rt1ag0.chat.Model.TODO;
 import com.novoda.v3rt1ag0.chat.displayer.ChatDisplayer;
 import com.novoda.v3rt1ag0.chat.presenter.ChatPresenter;
 import com.novoda.v3rt1ag0.navigation.AndroidNavigator;
@@ -37,17 +46,18 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
     private static final String ACCESS_EXTRA = "channel_access";
     String channelname;
     Switch admin_switch;
-    ListView starredmessagelist;
+    ListView starredmessagelist,noteslstview,todolistview;
+    ImageView todoimage,notesimage,show_hide_toggle,cancel_button;
     DatabaseReference database;
     AdminMode adminMode;
     private ChatPresenter presenter;
-    LinearLayout messagelayout;
+    LinearLayout messagelayout,popup_linear_layout;
     public static String userid;
+    String username;
 
     public static Intent createIntentFor(Context context, Channel channel)
     {
         Intent intent = new Intent(context, ChatActivity.class);
-
         intent.putExtra(NAME_EXTRA, channel.getName());
         intent.putExtra(ACCESS_EXTRA, channel.getAccess().name());
         return intent;
@@ -65,7 +75,6 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
             public void onDataChange(DataSnapshot dataSnapshot)
             {
                 adminMode.setOwner(dataSnapshot.getValue());
-                ;
                 database.child("adminCheck").child(channelname).setValue(adminMode);
                 //  database.child("adminCheck").push().setValue(adminMode);
             }
@@ -90,9 +99,84 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
         admin_switch = (Switch) findViewById(R.id.admin_switch);
         messagelayout = (LinearLayout) findViewById(R.id.message_layout);
         starredmessagelist = (ListView) findViewById(R.id.starredRecycler);
+        noteslstview= (ListView) findViewById(R.id.noteslistview);
+        todolistview=(ListView) findViewById(R.id.todolistview);
+        todoimage= (ImageView) findViewById(R.id.TODOImage);
+        notesimage= (ImageView) findViewById(R.id.NotesImage);
+        popup_linear_layout= (LinearLayout) findViewById(R.id.popup_linearlayout);
+        show_hide_toggle= (ImageView) findViewById(R.id.show_hide_image);
+        cancel_button= (ImageView) findViewById(R.id.cancel_button);
+
+        cancel_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                Animation bottom_down = AnimationUtils.loadAnimation(v.getContext(),
+                        R.anim.bottom_down);
+                popup_linear_layout.startAnimation(bottom_down);
+                popup_linear_layout.setVisibility(View.GONE);
+            }
+        });
+
+        show_hide_toggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                Animation bottomUp = AnimationUtils.loadAnimation(v.getContext(),
+                        R.anim.bottom_up);
+                popup_linear_layout.startAnimation(bottomUp);
+                popup_linear_layout.setVisibility(View.VISIBLE);
+            }
+        });
+
+        todoimage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                final Dialog dialog = new Dialog(v.getContext());
+                dialog.setContentView(R.layout.edittextpopup);
+                final EditText text = (EditText) dialog.findViewById(R.id.edit_text);
+                Button button= (Button) dialog.findViewById(R.id.post_button);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        TODO todo=new TODO(System.currentTimeMillis(),text.getText().toString(),username);
+                        database.child("TODO").child(channelname).push().setValue(todo);
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+            }
+        });
+
+        notesimage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                final Dialog dialog = new Dialog(v.getContext());
+                dialog.setContentView(R.layout.edittextpopup);
+                final EditText text = (EditText) dialog.findViewById(R.id.edit_text);
+                Button button= (Button) dialog.findViewById(R.id.post_button);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        Note note=new Note(System.currentTimeMillis(),text.getText().toString(),username);
+                        database.child("Notes").child(channelname).push().setValue(note);
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+            }
+        });
+
         admin_switch.setOnCheckedChangeListener(this);
+        getUsername();
         checkAdminEnabled();
-        setListView();
+        setListViewForStarred();
+        setListViewForNotes();
+        setListViewForTODO();
 
 
         Log.d("customlog", userid);
@@ -110,7 +194,80 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
         );
     }
 
-    private void setListView()
+    private void getUsername()
+    {
+        database.child("users").addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren())
+                {
+                    if(postSnapshot.getKey().equals(userid))
+                    {
+                        username=postSnapshot.child("name").getValue().toString();
+                        Log.d("username",username);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
+    }
+
+    private void setListViewForNotes()
+    {
+        database.child("Notes").child(channelname).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren())
+                {
+                    Note note = postSnapshot.getValue(Note.class);
+                    String content=note.getContent();
+                    String editedby=note.getEditedby();
+                    String date=formattedTimeFrom(String.valueOf(note.getTimestamp()));
+                    Log.d("note", note.getContent());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
+    }
+
+    private void setListViewForTODO()
+    {
+        database.child("TODO").child(channelname).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren())
+                {
+                   TODO todo = postSnapshot.getValue(TODO.class);
+                    String content=todo.getContent();
+                    String editedby=todo.getEditedby();
+                    String date=formattedTimeFrom(String.valueOf(todo.getTimestamp()));
+                    Log.d("TODO",date);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
+    }
+
+    private void setListViewForStarred()
     {
 
         database.child("StarredMessage").child(channelname).addValueEventListener(new ValueEventListener()
