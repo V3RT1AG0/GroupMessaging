@@ -70,7 +70,6 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
             }
         });
 
-
     }
 
     @Override
@@ -82,10 +81,10 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
         adminMode = new AdminMode();
         channelname = getIntent().getStringExtra(NAME_EXTRA);
         admin_switch = (Switch) findViewById(R.id.admin_switch);
-        messagelayout= (LinearLayout) findViewById(R.id.message_layout);
+        messagelayout = (LinearLayout) findViewById(R.id.message_layout);
         admin_switch.setOnCheckedChangeListener(this);
         checkAdminEnabled();
-        Log.d("customlog",userid);
+        Log.d("customlog", userid);
         ChatDisplayer chatDisplayer = (ChatDisplayer) findViewById(R.id.chat_view);
         Channel channel = new Channel(channelname,
                 Channel.Access.valueOf(getIntent().getStringExtra(ACCESS_EXTRA)));
@@ -121,12 +120,15 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
+                Log.d("hello",channelname);
                 try
                 {
+
                     if (Integer.parseInt(dataSnapshot.child("adminmode").getValue().toString()) == 1)
                     {
                         admin_switch.setChecked(true);
                         messagelayout.setVisibility(View.GONE);
+
                         Log.d("enabled", "enabled");
                     } else
                     {
@@ -134,30 +136,30 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
                         messagelayout.setVisibility(View.VISIBLE);
                         Log.d("disabled", "disabled");
                     }
-                }
-                catch (NullPointerException e)
+                } catch (NullPointerException e)
                 {
                     admin_switch.setChecked(false);
                     Log.d("disabled", "disabled");
                 }
 
-                if(dataSnapshot.child("owner").exists())
+                if (dataSnapshot.child("owner").exists())
                 {
                     //while (iterator.hasNext())
-                   // Log.d("hello", String.valueOf(dataSnapshot.child("owner").getChildren().iterator().next().getKey()));
-                    for (DataSnapshot postSnapshot: dataSnapshot.child("owner").getChildren()) {
-                        if(postSnapshot.getKey().equals(userid))
+                    // Log.d("hello", String.valueOf(dataSnapshot.child("owner").getChildren().iterator().next().getKey()));
+                    for (DataSnapshot postSnapshot : dataSnapshot.child("owner").getChildren())
+                    {
+                        if (postSnapshot.getKey().equals(userid))
                         {
                             admin_switch.setEnabled(true);
                             messagelayout.setVisibility(View.VISIBLE);
+                            Log.d("custom", userid);
                             break;
-                        }
-                        else
+                        } else
                         {
                             admin_switch.setEnabled(false);
-                            break;
+                            Log.d("custom2", userid);
                         }
-                       // Log.d("hello",postSnapshot.getKey());
+                        // Log.d("hello",postSnapshot.getKey());
                     }
                 }
 
