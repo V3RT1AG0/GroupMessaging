@@ -48,7 +48,7 @@ class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
             throw new DeveloperError("There is an unknown view type, you should inflate a view for it.");
         }
         messageView.setTextBackground(bubbleDrawable);
-        return new MessageViewHolder(messageView);
+        return new MessageViewHolder(messageView,chat);
     }
 
     @Override

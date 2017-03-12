@@ -34,8 +34,6 @@ public class ChatView extends LinearLayout implements ChatDisplayer
     private ImageView submitButton;
     private RecyclerView recyclerView;
     private Toolbar toolbar;
-    private DrawerLayout mDrawerLayout;
-    private Switch admin_switch;
 
     private ChatActionListener actionListener;
 
@@ -51,8 +49,6 @@ public class ChatView extends LinearLayout implements ChatDisplayer
     {
         super.onFinishInflate();
         View.inflate(getContext(), R.layout.merge_chat_view, this);
-        mDrawerLayout = Views.findById(this, R.id.drawer_layout);
-        admin_switch = Views.findById(this, R.id.admin_switch);
         messageView = Views.findById(this, R.id.message_edit);
         submitButton = Views.findById(this, R.id.submit_button);
         recyclerView = Views.findById(this, R.id.messages_recycler_view);

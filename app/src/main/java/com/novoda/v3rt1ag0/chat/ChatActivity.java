@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Switch;
 
 import com.google.firebase.database.DataSnapshot;
@@ -23,6 +25,10 @@ import com.novoda.v3rt1ag0.chat.displayer.ChatDisplayer;
 import com.novoda.v3rt1ag0.chat.presenter.ChatPresenter;
 import com.novoda.v3rt1ag0.navigation.AndroidNavigator;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public class ChatActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener
 {
@@ -31,6 +37,7 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
     private static final String ACCESS_EXTRA = "channel_access";
     String channelname;
     Switch admin_switch;
+    ListView starredmessagelist;
     DatabaseReference database;
     AdminMode adminMode;
     private ChatPresenter presenter;
@@ -82,8 +89,12 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
         channelname = getIntent().getStringExtra(NAME_EXTRA);
         admin_switch = (Switch) findViewById(R.id.admin_switch);
         messagelayout = (LinearLayout) findViewById(R.id.message_layout);
+        starredmessagelist = (ListView) findViewById(R.id.starredRecycler);
         admin_switch.setOnCheckedChangeListener(this);
         checkAdminEnabled();
+        setListView();
+
+
         Log.d("customlog", userid);
         ChatDisplayer chatDisplayer = (ChatDisplayer) findViewById(R.id.chat_view);
         Channel channel = new Channel(channelname,
@@ -97,6 +108,40 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
                 new AndroidNavigator(this),
                 Dependencies.INSTANCE.getErrorLogger()
         );
+    }
+
+    private void setListView()
+    {
+
+        database.child("StarredMessage").child(channelname).addValueEventListener(new ValueEventListener()
+        {
+            String[] values;
+
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                int i = 0;
+                values = new String[(int) dataSnapshot.getChildrenCount()];
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren())
+                {
+                    Log.d("hello", postSnapshot.getValue().toString());
+                    values[i] = postSnapshot.getValue().toString()+"\n"+formattedTimeFrom(postSnapshot.getKey());
+                    i++;
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(ChatActivity.this,
+                        android.R.layout.simple_list_item_1, android.R.id.text1, values);
+                starredmessagelist.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
+
+
     }
 
     @Override
@@ -120,7 +165,7 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
-                Log.d("hello",channelname);
+                Log.d("hello", channelname);
                 try
                 {
 
@@ -172,6 +217,13 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
 
             }
         });
+    }
+
+    private String formattedTimeFrom(String timestamp) {
+        Date date=new Date();
+        DateFormat timeFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+        date.setTime(Long.parseLong(timestamp));
+        return timeFormat.format(date);
     }
 
 
