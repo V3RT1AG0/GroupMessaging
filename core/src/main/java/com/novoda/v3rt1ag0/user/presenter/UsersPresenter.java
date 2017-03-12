@@ -14,7 +14,8 @@ import com.novoda.v3rt1ag0.user.service.UserService;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
-public class UsersPresenter {
+public class UsersPresenter
+{
     private final UserService userService;
     private final ChannelService channelService;
     private final UsersDisplayer usersDisplayer;
@@ -30,7 +31,8 @@ public class UsersPresenter {
                           Channel channel,
                           Navigator navigator,
                           ErrorLogger errorLogger,
-                          Analytics analytics) {
+                          Analytics analytics)
+    {
         this.userService = userService;
         this.channelService = channelService;
         this.usersDisplayer = usersDisplayer;
@@ -40,25 +42,32 @@ public class UsersPresenter {
         this.analytics = analytics;
     }
 
-    public void startPresenting() {
+    public void startPresenting()
+    {
         usersDisplayer.attach(selectionListener);
 
         subscriptions.add(
-                userService.getAllUsers().subscribe(new Action1<Users>() {
+                userService.getAllUsers().subscribe(new Action1<Users>()
+                {
                     @Override
-                    public void call(Users users) {
+                    public void call(Users users)
+                    {
                         usersDisplayer.display(users);
                     }
                 })
         );
         subscriptions.add(
                 channelService.getOwnersOfChannel(channel)
-                        .subscribe(new Action1<DatabaseResult<Users>>() {
+                        .subscribe(new Action1<DatabaseResult<Users>>()
+                        {
                             @Override
-                            public void call(DatabaseResult<Users> databaseResult) {
-                                if (databaseResult.isSuccess()) {
+                            public void call(DatabaseResult<Users> databaseResult)
+                            {
+                                if (databaseResult.isSuccess())
+                                {
                                     usersDisplayer.displaySelectedUsers(databaseResult.getData());
-                                } else {
+                                } else
+                                {
                                     errorLogger.reportError(databaseResult.getFailure(), "Cannot fetch channel owners");
                                     usersDisplayer.showFailure();
                                 }
@@ -67,38 +76,47 @@ public class UsersPresenter {
         );
     }
 
-    public void stopPresenting() {
+    public void stopPresenting()
+    {
         usersDisplayer.detach(selectionListener);
         subscriptions.clear();
         subscriptions = new CompositeSubscription();
     }
 
-    private UsersDisplayer.SelectionListener selectionListener = new UsersDisplayer.SelectionListener() {
+    private UsersDisplayer.SelectionListener selectionListener = new UsersDisplayer.SelectionListener()
+    {
         @Override
-        public void onUserSelected(final User user) {
+        public void onUserSelected(final User user)
+        {
             analytics.trackAddChannelOwner(channel.getName(), user.getId());
             channelService.addOwnerToPrivateChannel(channel, user)
                     .subscribe(updateOnActionResult());
         }
 
         @Override
-        public void onUserDeselected(User user) {
+        public void onUserDeselected(User user)
+        {
             analytics.trackRemoveChannelOwner(channel.getName(), user.getId());
             channelService.removeOwnerFromPrivateChannel(channel, user)
                     .subscribe(updateOnActionResult());
         }
 
         @Override
-        public void onCompleteClicked() {
+        public void onCompleteClicked()
+        {
             navigator.toParent();
         }
     };
 
-    private Action1<DatabaseResult<User>> updateOnActionResult() {
-        return new Action1<DatabaseResult<User>>() {
+    private Action1<DatabaseResult<User>> updateOnActionResult()
+    {
+        return new Action1<DatabaseResult<User>>()
+        {
             @Override
-            public void call(DatabaseResult<User> userDatabaseResult) {
-                if (!userDatabaseResult.isSuccess()) {
+            public void call(DatabaseResult<User> userDatabaseResult)
+            {
+                if (!userDatabaseResult.isSuccess())
+                {
                     errorLogger.reportError(userDatabaseResult.getFailure(), "Cannot update channel owners");
                     usersDisplayer.showFailure();
                 }

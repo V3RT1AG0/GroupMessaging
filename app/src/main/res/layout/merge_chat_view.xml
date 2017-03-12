@@ -1,47 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <include layout="@layout/toolbar_inverted_layout" />
-
-  <FrameLayout
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="1">
-
-    <android.support.v7.widget.RecyclerView
-      android:id="@+id/messages_recycler_view"
-      style="@style/Chat.RecyclerView"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent" />
-
-    <LinearLayout
-      style="@style/Chat.NewMessage.Layout"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_gravity="bottom"
-      android:layout_marginBottom="@dimen/chat_new_message_margin"
-      android:layout_marginEnd="@dimen/chat_new_message_margin"
-      android:layout_marginStart="@dimen/chat_new_message_margin"
-      android:orientation="horizontal">
-
-      <EditText
-        android:id="@+id/message_edit"
-        style="@style/Chat.NewMessage.Text"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
-
-      <ImageView
-        android:id="@+id/submit_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/chat_new_message_margin"
-        android:src="@drawable/ic_send" />
 
 
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    </LinearLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
 
-  </FrameLayout>
+            <include layout="@layout/toolbar_inverted_layout"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/messages_recycler_view"
+                style="@style/Chat.RecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <LinearLayout
+                android:id="@+id/message_layout"
+                style="@style/Chat.NewMessage.Layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="@dimen/chat_new_message_margin"
+                android:layout_marginEnd="@dimen/chat_new_message_margin"
+                android:layout_marginStart="@dimen/chat_new_message_margin"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/message_edit"
+                    style="@style/Chat.NewMessage.Text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <ImageView
+                    android:id="@+id/submit_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/chat_new_message_margin"
+                    android:src="@drawable/ic_send"/>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/navList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="right|end"
+            android:background="#ffeeeeee">
+
+            <LinearLayout
+                android:layout_margin="10dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="Admin Mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <Switch
+                    android:id="@+id/admin_switch"
+                    android:layout_marginStart="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </android.support.v4.widget.DrawerLayout>
+
 
 </merge>

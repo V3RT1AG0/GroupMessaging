@@ -107,7 +107,7 @@ public class ChannelsPresenter {
     private final ChannelsDisplayer.ChannelsInteractionListener channelsInteractionListener = new ChannelsDisplayer.ChannelsInteractionListener() {
         @Override
         public void onChannelSelected(Channel channel) {
-            analytics.trackSelectChannel(channel.getName());
+            analytics.trackSelectChannel(channel.getName(),user.getId());
             navigator.toChannel(channel);
         }
 

@@ -6,7 +6,7 @@ public interface Analytics {
 
     void trackSignInSuccessful(String method);
 
-    void trackSelectChannel(String channelName);
+    void trackSelectChannel(String channelName, String id);
 
     void trackMessageLength(int messageLength, String userId, String channelName);
 

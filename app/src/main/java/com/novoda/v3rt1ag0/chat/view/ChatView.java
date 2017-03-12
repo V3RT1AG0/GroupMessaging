@@ -3,6 +3,7 @@ package com.novoda.v3rt1ag0.chat.view;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -12,36 +13,46 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.novoda.v3rt1ag0.R;
+import com.novoda.v3rt1ag0.chat.ChatActivity;
 import com.novoda.v3rt1ag0.chat.data.model.Chat;
 import com.novoda.v3rt1ag0.chat.displayer.ChatDisplayer;
 import com.novoda.v3rt1ag0.user.data.model.User;
 import com.novoda.notils.caster.Views;
 
-public class ChatView extends LinearLayout implements ChatDisplayer {
+public class ChatView extends LinearLayout implements ChatDisplayer
+{
 
     private final ChatAdapter chatAdapter;
     private TextView messageView;
     private ImageView submitButton;
     private RecyclerView recyclerView;
     private Toolbar toolbar;
+    private DrawerLayout mDrawerLayout;
+    private Switch admin_switch;
 
     private ChatActionListener actionListener;
 
-    public ChatView(Context context, AttributeSet attrs) {
+    public ChatView(Context context, AttributeSet attrs)
+    {
         super(context, attrs);
         setOrientation(VERTICAL);
         chatAdapter = new ChatAdapter(LayoutInflater.from(context));
     }
 
     @Override
-    protected void onFinishInflate() {
+    protected void onFinishInflate()
+    {
         super.onFinishInflate();
         View.inflate(getContext(), R.layout.merge_chat_view, this);
+        mDrawerLayout = Views.findById(this, R.id.drawer_layout);
+        admin_switch = Views.findById(this, R.id.admin_switch);
         messageView = Views.findById(this, R.id.message_edit);
         submitButton = Views.findById(this, R.id.submit_button);
         recyclerView = Views.findById(this, R.id.messages_recycler_view);
@@ -49,6 +60,8 @@ public class ChatView extends LinearLayout implements ChatDisplayer {
         toolbar = Views.findById(this, R.id.toolbar);
         toolbar.inflateMenu(R.menu.chat_menu);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
@@ -56,7 +69,8 @@ public class ChatView extends LinearLayout implements ChatDisplayer {
     }
 
     @Override
-    public void attach(final ChatActionListener actionListener) {
+    public void attach(final ChatActionListener actionListener)
+    {
         this.actionListener = actionListener;
         messageView.addTextChangedListener(textWatcher);
         submitButton.setOnClickListener(submitClickListener);
@@ -65,7 +79,8 @@ public class ChatView extends LinearLayout implements ChatDisplayer {
     }
 
     @Override
-    public void detach(ChatActionListener actionListener) {
+    public void detach(ChatActionListener actionListener)
+    {
         submitButton.setOnClickListener(null);
         messageView.removeTextChangedListener(textWatcher);
         toolbar.setOnMenuItemClickListener(null);
@@ -73,66 +88,82 @@ public class ChatView extends LinearLayout implements ChatDisplayer {
     }
 
     @Override
-    public void setTitle(String title) {
+    public void setTitle(String title)
+    {
         toolbar.setTitle(title);
     }
 
     @Override
-    public void showAddMembersButton() {
+    public void showAddMembersButton()
+    {
         toolbar.getMenu().findItem(R.id.manageOwners).setVisible(true);
     }
 
     @Override
-    public void display(Chat chat, User user) {
+    public void display(Chat chat, User user)
+    {
         chatAdapter.update(chat, user);
         int lastMessagePosition = chatAdapter.getItemCount() == 0 ? 0 : chatAdapter.getItemCount() - 1;
         recyclerView.smoothScrollToPosition(lastMessagePosition);
     }
 
     @Override
-    public void enableInteraction() {
+    public void enableInteraction()
+    {
         submitButton.setEnabled(true);
         submitButton.setColorFilter(null);
     }
 
     @Override
-    public void disableInteraction() {
+    public void disableInteraction()
+    {
         submitButton.setEnabled(false);
         submitButton.setColorFilter(getResources().getColor(R.color.disabled_grey), PorterDuff.Mode.SRC_ATOP);
     }
 
-    private final TextWatcher textWatcher = new TextWatcher() {
+    private final TextWatcher textWatcher = new TextWatcher()
+    {
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        public void beforeTextChanged(CharSequence s, int start, int count, int after)
+        {
         }
 
         @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        public void onTextChanged(CharSequence s, int start, int before, int count)
+        {
         }
 
         @Override
-        public void afterTextChanged(Editable s) {
+        public void afterTextChanged(Editable s)
+        {
             actionListener.onMessageLengthChanged(s.toString().trim().length());
         }
     };
 
-    private final OnClickListener submitClickListener = new OnClickListener() {
+    private final OnClickListener submitClickListener = new OnClickListener()
+    {
         @Override
-        public void onClick(View v) {
+        public void onClick(View v)
+        {
             actionListener.onSubmitMessage(messageView.getText().toString().trim());
             messageView.setText("");
         }
     };
-    private final OnClickListener navigationClickListener = new OnClickListener() {
+    private final OnClickListener navigationClickListener = new OnClickListener()
+    {
         @Override
-        public void onClick(View v) {
+        public void onClick(View v)
+        {
             actionListener.onUpPressed();
         }
     };
-    private Toolbar.OnMenuItemClickListener menuItemClickListener = new Toolbar.OnMenuItemClickListener() {
+    private Toolbar.OnMenuItemClickListener menuItemClickListener = new Toolbar.OnMenuItemClickListener()
+    {
         @Override
-        public boolean onMenuItemClick(MenuItem item) {
-            if (item.getItemId() == R.id.manageOwners) {
+        public boolean onMenuItemClick(MenuItem item)
+        {
+            if (item.getItemId() == R.id.manageOwners)
+            {
                 actionListener.onManageOwnersClicked();
                 return true;
             }
@@ -140,13 +171,16 @@ public class ChatView extends LinearLayout implements ChatDisplayer {
         }
     };
 
-    private class ChatItemDecoration extends RecyclerView.ItemDecoration {
+
+    private class ChatItemDecoration extends RecyclerView.ItemDecoration
+    {
 
         private final int horizontalMargin = getResources().getDimensionPixelOffset(R.dimen.chat_item_horizontal_margin);
         private final int verticalMargin = getResources().getDimensionPixelOffset(R.dimen.chat_item_vertical_margin);
 
         @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state)
+        {
             outRect.left = horizontalMargin;
             outRect.right = horizontalMargin;
             outRect.top = verticalMargin;

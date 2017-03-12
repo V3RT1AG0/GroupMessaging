@@ -1,8 +1,10 @@
 package com.novoda.v3rt1ag0.analytics;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.novoda.v3rt1ag0.chat.ChatActivity;
 
 import static com.google.firebase.analytics.FirebaseAnalytics.Event;
 import static com.google.firebase.analytics.FirebaseAnalytics.Param;
@@ -46,10 +48,13 @@ public class FirebaseAnalyticsAnalytics implements Analytics {
     }
 
     @Override
-    public void trackSelectChannel(String channelName) {
+    public void trackSelectChannel(String channelName, String id) {
+        ChatActivity.userid=id;
         Bundle bundle = new Bundle();
         bundle.putString(Param.CONTENT_TYPE, CONTENT_TYPE_CHANNEL);
         bundle.putString(Param.ITEM_ID, channelName);
+       // Log.d("customlog",id);
+
         firebaseAnalytics.logEvent(Event.SELECT_CONTENT, bundle);
     }
 
