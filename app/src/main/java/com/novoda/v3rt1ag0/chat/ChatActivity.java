@@ -47,20 +47,21 @@ import com.novoda.v3rt1ag0.chat.FileManager.MainActivity;
 import com.novoda.v3rt1ag0.chat.Model.AdminMode;
 import com.novoda.v3rt1ag0.chat.Model.Files;
 import com.novoda.v3rt1ag0.chat.Model.Note;
+import com.novoda.v3rt1ag0.chat.Model.Notification;
 import com.novoda.v3rt1ag0.chat.Model.TODO;
 import com.novoda.v3rt1ag0.chat.displayer.ChatDisplayer;
 import com.novoda.v3rt1ag0.chat.presenter.ChatPresenter;
 import com.novoda.v3rt1ag0.navigation.AndroidNavigator;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 
-public class ChatActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener
+public class ChatActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener, com.wdullaer.materialdatetimepicker.time.TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener
 {
 
     private static final String NAME_EXTRA = "channel_name";
@@ -68,9 +69,10 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
     private static final int REQUEST_CODE = 22;
     ;
     String channelname;
+    ChatDisplayer chatDisplayer;
     Switch admin_switch;
-    ListView starredmessagelist, noteslstview, todolistview;
-    ImageView todoimage, notesimage, show_hide_toggle, cancel_button;
+    ListView starredmessagelist, noteslstview, todolistview, notificationlistview;
+    ImageView todoimage, notesimage, show_hide_toggle, cancel_button, add_notification;
     DatabaseReference database;
     AdminMode adminMode;
     private ChatPresenter presenter;
@@ -93,7 +95,7 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
         adminMode.setAdminmode(enabled);
         adminMode.setChannelname(channelname);
         database.child("adminCheck").child(channelname).setValue(adminMode);
-        database.child("owners").child(channelname).addValueEventListener(new ValueEventListener()
+        database.child("Admin").child(channelname).addValueEventListener(new ValueEventListener()
         {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
@@ -125,11 +127,14 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
         starredmessagelist = (ListView) findViewById(R.id.starredRecycler);
         noteslstview = (ListView) findViewById(R.id.noteslistview);
         todolistview = (ListView) findViewById(R.id.todolistview);
+        notificationlistview = (ListView) findViewById(R.id.notificationlistview);
         todoimage = (ImageView) findViewById(R.id.TODOImage);
         notesimage = (ImageView) findViewById(R.id.NotesImage);
         popup_linear_layout = (LinearLayout) findViewById(R.id.popup_linearlayout);
         show_hide_toggle = (ImageView) findViewById(R.id.show_hide_image);
         cancel_button = (ImageView) findViewById(R.id.cancel_button);
+        add_notification = (ImageView) findViewById(R.id.AddNotification);
+        chatDisplayer = (ChatDisplayer) findViewById(R.id.chat_view);
         ImageView file_chooser = (ImageView) findViewById(R.id.uploadfile);
         ImageView imageView = (ImageView) findViewById(R.id.open_all_files);
 
@@ -242,16 +247,37 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
             }
         });
 
+
+        add_notification.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+
+                Calendar now = Calendar.getInstance();
+                DatePickerDialog dpd = DatePickerDialog.newInstance(
+                        ChatActivity.this,
+                        now.get(Calendar.YEAR),
+                        now.get(Calendar.MONTH),
+                        now.get(Calendar.DAY_OF_MONTH)
+                );
+
+                dpd.show(getFragmentManager(), "Datepickerdialog");
+
+            }
+        });
+
         admin_switch.setOnCheckedChangeListener(this);
         getUsername();
         checkAdminEnabled();
         setListViewForStarred();
         setListViewForNotes();
         setListViewForTODO();
+        setListViewForNotifications();
 
 
         // Log.d("customlog", userid);
-        ChatDisplayer chatDisplayer = (ChatDisplayer) findViewById(R.id.chat_view);
+
         Channel channel = new Channel(channelname,
                 Channel.Access.valueOf(getIntent().getStringExtra(ACCESS_EXTRA)));
         presenter = new ChatPresenter(
@@ -263,6 +289,7 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
                 new AndroidNavigator(this),
                 Dependencies.INSTANCE.getErrorLogger()
         );
+
     }
 
     private void getUsername()
@@ -491,6 +518,29 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
         });
     }
 
+    private void setListViewForNotifications()
+    {
+        database.child("Notification").child(channelname).addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren())
+                {
+                    Notification notification = postSnapshot.getValue(Notification.class);
+                    int hour= notification.getHour();
+                    int minute = notification.getMinute();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
+    }
+
     private void setListViewForStarred()
     {
 
@@ -578,10 +628,12 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
                         {
                             admin_switch.setEnabled(true);
                             messagelayout.setVisibility(View.VISIBLE);
+                            chatDisplayer.showAddMembersButton();
                             Log.d("custom", userid);
                             break;
                         } else
                         {
+
                             admin_switch.setEnabled(false);
                             Log.d("custom2", userid);
                         }
@@ -652,5 +704,40 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
             }
         }
         return result;
+    }
+
+    @Override
+    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth)
+    {
+        Calendar now = Calendar.getInstance();
+        com.wdullaer.materialdatetimepicker.time.TimePickerDialog dpd = com.wdullaer.materialdatetimepicker.time.TimePickerDialog.newInstance(
+                ChatActivity.this,
+                now.get(Calendar.HOUR_OF_DAY),
+                now.get(Calendar.MINUTE),
+                true
+
+        );
+        dpd.show(getFragmentManager(), "TimePickerDialog");
+    }
+
+    @Override
+    public void onTimeSet(com.wdullaer.materialdatetimepicker.time.TimePickerDialog view, final int hourOfDay, final int minute, int second)
+    {
+
+        final Dialog dialog = new Dialog(ChatActivity.this);
+        dialog.setContentView(R.layout.edittextpopup);
+        final EditText text = (EditText) dialog.findViewById(R.id.edit_text);
+        Button button = (Button) dialog.findViewById(R.id.post_button);
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Notification notification = new Notification(text.getText().toString(),hourOfDay,minute);
+                database.child("TODO").child(channelname).push().setValue(notification);
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 }

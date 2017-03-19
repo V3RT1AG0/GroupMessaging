@@ -1,8 +1,11 @@
 package com.novoda.v3rt1ag0.channel.database;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.novoda.v3rt1ag0.channel.data.model.Channel;
 import com.novoda.v3rt1ag0.rx.FirebaseObservableListeners;
 import com.novoda.v3rt1ag0.user.data.model.User;
@@ -68,7 +71,26 @@ public class FirebaseChannelsDatabase implements ChannelsDatabase {
     }
 
     @Override
-    public Observable<Channel> addChannelToUserPrivateChannelIndex(User user, Channel channel) {
+    public Observable<Channel> addChannelToUserPrivateChannelIndex(final User user, final Channel channel) {
+       /**Modified by v3rt1ag0 START**/
+        final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        database.child("Admin").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                if(!dataSnapshot.hasChild(channel.getName()))
+                {
+                    database.child("Admin").child(channel.getName()).child(user.getId()).setValue(true);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
+        /**Modified by v3rt1ag0 END**/
         return firebaseObservableListeners.setValue(true, privateChannelsDB.child(user.getId()).child(channel.getName()), channel);
     }
 

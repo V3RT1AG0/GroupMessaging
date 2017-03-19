@@ -53,9 +53,10 @@ public class ChatPresenter {
 
     public void startPresenting() {
         chatDisplayer.setTitle(channel.getName());
+        /*
         if (channel.isPrivate()) {
             chatDisplayer.showAddMembersButton();
-        }
+        }*/
         chatDisplayer.attach(actionListener);
         chatDisplayer.disableInteraction();
         subscriptions.add(

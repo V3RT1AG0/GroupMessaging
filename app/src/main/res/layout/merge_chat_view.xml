@@ -227,6 +227,28 @@
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/AddNotification"
+                        android:src="@drawable/ic_arrow_back"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@color/colorPrimary"/>
+
+                    <ImageView
+                        android:src="@drawable/ic_arrow_back"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@color/colorPrimaryDark"/>
+
+                </LinearLayout>
+
             </LinearLayout>
 
         </FrameLayout>

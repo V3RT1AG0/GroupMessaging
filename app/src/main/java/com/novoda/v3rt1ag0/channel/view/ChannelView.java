@@ -34,6 +34,6 @@ public class ChannelView extends FrameLayout {
 
     public void display(Channel channel) {
         title.setText(channel.getName());
-        lockIcon.setVisibility(channel.isPrivate() ? VISIBLE : GONE);
+        lockIcon.setVisibility(GONE);
     }
 }

@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.novoda.v3rt1ag0.chat.ChatActivity;
 import com.novoda.v3rt1ag0.chat.view.MessageView;
 import com.novoda.v3rt1ag0.chat.view.MessageViewHolder;

@@ -134,9 +134,9 @@ public class NewChannelView extends LinearLayout implements NewChannelDisplayer
         public void afterTextChanged(Editable s)
         {
             getCreateItem().setEnabled(s.length() > 0 && isValidInput);
-            if (!isValidInput)
+            if (s.length()==0)
             {
-                setChannelNameError(R.string.only_single_emoji_allowed);
+                setChannelNameError(R.string.blankchannelname);
             }
         }
     };

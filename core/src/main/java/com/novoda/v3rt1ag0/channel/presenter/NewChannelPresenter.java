@@ -59,7 +59,8 @@ public class NewChannelPresenter {
 
         @Override
         public void onCreateChannelClicked(String channelName, boolean isPrivate) {
-            Channel newChannel = new Channel(channelName.trim(), isPrivate ? Access.PRIVATE : Access.PUBLIC);
+            Channel newChannel = new Channel(channelName.trim(), isPrivate ? Access.PRIVATE : Access.PRIVATE);
+            /**Original code: Channel newChannel = new Channel(channelName.trim(), isPrivate ? Access.PRIVATE : Access.PUBLIC);**/
             subscriptions.add(
                     create(newChannel).subscribe(new Action1<DatabaseResult<Channel>>() {
                         @Override
