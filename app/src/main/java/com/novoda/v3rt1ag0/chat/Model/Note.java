@@ -6,7 +6,7 @@ package com.novoda.v3rt1ag0.chat.Model;
 
 public class Note
 {
-    Long timestamp;
+    String timestamp;
     String content;
     String editedby;
 
@@ -15,7 +15,7 @@ public class Note
 
     }
 
-    public Note(Long timestamp, String content, String editedby)
+    public Note(String timestamp, String content, String editedby)
     {
         this.timestamp=timestamp;
         this.content=content;
@@ -27,7 +27,7 @@ public class Note
         return content;
     }
 
-    public Long getTimestamp()
+    public String getTimestamp()
     {
         return timestamp;
     }

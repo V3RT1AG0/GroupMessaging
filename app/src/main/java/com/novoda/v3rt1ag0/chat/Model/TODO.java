@@ -7,20 +7,24 @@ package com.novoda.v3rt1ag0.chat.Model;
 public class TODO
 {
 
-    Long timestamp;
+    String timestamp;
+    Boolean checked;
     String content;
     String editedby;
+    String key;
 
     TODO()
     {
 
     }
 
-    public TODO(Long timestamp, String content, String editedby)
+    public TODO(String timestamp, String content, String editedby,Boolean checked,String key)
     {
         this.timestamp=timestamp;
         this.content=content;
         this.editedby=editedby;
+        this.checked=checked;
+        this.key=key;
     }
 
     public String getContent()
@@ -28,7 +32,7 @@ public class TODO
         return content;
     }
 
-    public Long getTimestamp()
+    public String getTimestamp()
     {
         return timestamp;
     }
@@ -36,5 +40,15 @@ public class TODO
     public String getEditedby()
     {
         return editedby;
+    }
+
+    public Boolean getChecked()
+    {
+        return checked;
+    }
+
+    public String getKey()
+    {
+        return key;
     }
 }

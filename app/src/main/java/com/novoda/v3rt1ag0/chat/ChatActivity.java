@@ -11,9 +11,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -43,11 +47,17 @@ import com.novoda.v3rt1ag0.BaseActivity;
 import com.novoda.v3rt1ag0.Dependencies;
 import com.novoda.v3rt1ag0.R;
 import com.novoda.v3rt1ag0.channel.data.model.Channel;
+import com.novoda.v3rt1ag0.chat.Adapters.NotesAdapter;
+import com.novoda.v3rt1ag0.chat.Adapters.NotificationAdapter;
+import com.novoda.v3rt1ag0.chat.Adapters.StarredMessageAdapter;
+import com.novoda.v3rt1ag0.chat.Adapters.TODOadapter;
 import com.novoda.v3rt1ag0.chat.FileManager.MainActivity;
+import com.novoda.v3rt1ag0.chat.FileManager.MyAdapter;
 import com.novoda.v3rt1ag0.chat.Model.AdminMode;
 import com.novoda.v3rt1ag0.chat.Model.Files;
 import com.novoda.v3rt1ag0.chat.Model.Note;
 import com.novoda.v3rt1ag0.chat.Model.Notification;
+import com.novoda.v3rt1ag0.chat.Model.StarredMessage;
 import com.novoda.v3rt1ag0.chat.Model.TODO;
 import com.novoda.v3rt1ag0.chat.displayer.ChatDisplayer;
 import com.novoda.v3rt1ag0.chat.presenter.ChatPresenter;
@@ -55,10 +65,15 @@ import com.novoda.v3rt1ag0.navigation.AndroidNavigator;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.math.BigInteger;
 
 
 public class ChatActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener, com.wdullaer.materialdatetimepicker.time.TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener
@@ -67,12 +82,18 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
     private static final String NAME_EXTRA = "channel_name";
     private static final String ACCESS_EXTRA = "channel_access";
     private static final int REQUEST_CODE = 22;
-    ;
     String channelname;
     ChatDisplayer chatDisplayer;
     Switch admin_switch;
-    ListView starredmessagelist, noteslstview, todolistview, notificationlistview;
-    ImageView todoimage, notesimage, show_hide_toggle, cancel_button, add_notification;
+    RecyclerView starredmessagerecycler, noteslstviewrecycler, todolistviewrecycler, notificationrecycler,filemanagerrecycler;
+    List<StarredMessage> starredMessageList;
+    List<Note> notesList;
+    List<TODO> todoList;
+    List<Files> fileslist;
+    int day=0,month=0,year=0;
+    List<Notification> notificationList;
+    ImageView todoimage, notesimage, cancel_button, add_notification;
+    FloatingActionButton show_hide_toggle;
     DatabaseReference database;
     AdminMode adminMode;
     private ChatPresenter presenter;
@@ -124,17 +145,25 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
         channelname = getIntent().getStringExtra(NAME_EXTRA);
         admin_switch = (Switch) findViewById(R.id.admin_switch);
         messagelayout = (LinearLayout) findViewById(R.id.message_layout);
-        starredmessagelist = (ListView) findViewById(R.id.starredRecycler);
-        noteslstview = (ListView) findViewById(R.id.noteslistview);
-        todolistview = (ListView) findViewById(R.id.todolistview);
-        notificationlistview = (ListView) findViewById(R.id.notificationlistview);
+        starredmessagerecycler = (RecyclerView) findViewById(R.id.starredRecycler);
+        noteslstviewrecycler = (RecyclerView) findViewById(R.id.noteslistview);
+        todolistviewrecycler = (RecyclerView) findViewById(R.id.todolistview);
+        notificationrecycler = (RecyclerView) findViewById(R.id.notificationlistview);
+        filemanagerrecycler= (RecyclerView) findViewById(R.id.filelist);
         todoimage = (ImageView) findViewById(R.id.TODOImage);
         notesimage = (ImageView) findViewById(R.id.NotesImage);
         popup_linear_layout = (LinearLayout) findViewById(R.id.popup_linearlayout);
-        show_hide_toggle = (ImageView) findViewById(R.id.show_hide_image);
+        show_hide_toggle = (FloatingActionButton) findViewById(R.id.show_hide_image);
         cancel_button = (ImageView) findViewById(R.id.cancel_button);
         add_notification = (ImageView) findViewById(R.id.AddNotification);
         chatDisplayer = (ChatDisplayer) findViewById(R.id.chat_view);
+        starredMessageList = new ArrayList<>();
+        notesList = new ArrayList<>();
+        todoList = new ArrayList<>();
+        fileslist = new ArrayList<>();
+        notificationList = new ArrayList<>();
+
+
         ImageView file_chooser = (ImageView) findViewById(R.id.uploadfile);
         ImageView imageView = (ImageView) findViewById(R.id.open_all_files);
 
@@ -186,6 +215,7 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
                         R.anim.bottom_down);
                 popup_linear_layout.startAnimation(bottom_down);
                 popup_linear_layout.setVisibility(View.GONE);
+                show_hide_toggle.setVisibility(View.VISIBLE);
             }
         });
 
@@ -198,6 +228,7 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
                         R.anim.bottom_up);
                 popup_linear_layout.startAnimation(bottomUp);
                 popup_linear_layout.setVisibility(View.VISIBLE);
+                show_hide_toggle.setVisibility(View.GONE);
             }
         });
 
@@ -215,8 +246,10 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
                     @Override
                     public void onClick(View v)
                     {
-                        TODO todo = new TODO(System.currentTimeMillis(), text.getText().toString(), username);
-                        database.child("TODO").child(channelname).push().setValue(todo);
+                        SecureRandom random = new SecureRandom();
+                        String key = new BigInteger(130, random).toString(32);
+                        TODO todo = new TODO(Long.toString(System.currentTimeMillis()), text.getText().toString(), username, false, key);
+                        database.child("TODO").child(channelname).child(key).setValue(todo);
                         dialog.dismiss();
                     }
                 });
@@ -238,7 +271,7 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
                     @Override
                     public void onClick(View v)
                     {
-                        Note note = new Note(System.currentTimeMillis(), text.getText().toString(), username);
+                        Note note = new Note(Long.toString(System.currentTimeMillis()), text.getText().toString(), username);
                         database.child("Notes").child(channelname).push().setValue(note);
                         dialog.dismiss();
                     }
@@ -274,6 +307,7 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
         setListViewForNotes();
         setListViewForTODO();
         setListViewForNotifications();
+        setListViewForFiles();
 
 
         // Log.d("customlog", userid);
@@ -290,6 +324,39 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
                 Dependencies.INSTANCE.getErrorLogger()
         );
 
+    }
+
+    private void setListViewForFiles()
+    {
+
+        database.child("FileStorage").child(channelname).addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                fileslist.clear();
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren())
+                {
+
+                    Log.d("TAG", "executed");
+                    if(postSnapshot.getKey().equals("directory")||postSnapshot.getKey().equals("filename"))
+                        continue;
+                    Files file = postSnapshot.getValue(Files.class);
+                    Log.d("TAG", file.getFilename());
+                    fileslist.add(new Files(file.getDirectory(), file.getDownloadpath(), file.getFilename()));
+                }
+                MyAdapter myAdapter = new MyAdapter(fileslist,"FileStorage/" + channelname,channelname,userid);
+                filemanagerrecycler.setHasFixedSize(true);
+                filemanagerrecycler.setLayoutManager(new LinearLayoutManager(ChatActivity.this));
+                filemanagerrecycler.setAdapter(myAdapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
     }
 
     private void getUsername()
@@ -475,14 +542,17 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
+                NotesAdapter adapter;
+                notesList.clear();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren())
                 {
-                    Note note = postSnapshot.getValue(Note.class);
-                    String content = note.getContent();
-                    String editedby = note.getEditedby();
-                    String date = formattedTimeFrom(String.valueOf(note.getTimestamp()));
-                    Log.d("note", note.getContent());
+                    Note notes = postSnapshot.getValue(Note.class);
+                    notesList.add(notes);
                 }
+                adapter = new NotesAdapter(notesList);
+                noteslstviewrecycler.setHasFixedSize(true);
+                noteslstviewrecycler.setLayoutManager(new LinearLayoutManager(ChatActivity.this));
+                noteslstviewrecycler.setAdapter(adapter);
             }
 
             @Override
@@ -500,14 +570,18 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
+                TODOadapter adapter;
+                todoList.clear();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren())
                 {
                     TODO todo = postSnapshot.getValue(TODO.class);
-                    String content = todo.getContent();
-                    String editedby = todo.getEditedby();
-                    String date = formattedTimeFrom(String.valueOf(todo.getTimestamp()));
-                    Log.d("TODO", date);
+                    todoList.add(todo);
                 }
+
+                adapter = new TODOadapter(todoList, channelname);
+                todolistviewrecycler.setHasFixedSize(true);
+                todolistviewrecycler.setLayoutManager(new LinearLayoutManager(ChatActivity.this));
+                todolistviewrecycler.setAdapter(adapter);
             }
 
             @Override
@@ -525,12 +599,17 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
+                NotificationAdapter adapter;
+                notificationList.clear();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren())
                 {
                     Notification notification = postSnapshot.getValue(Notification.class);
-                    int hour= notification.getHour();
-                    int minute = notification.getMinute();
+                    notificationList.add(notification);
                 }
+                adapter = new NotificationAdapter(notificationList);
+                notificationrecycler.setHasFixedSize(true);
+                notificationrecycler.setLayoutManager(new LinearLayoutManager(ChatActivity.this));
+                notificationrecycler.setAdapter(adapter);
             }
 
             @Override
@@ -546,23 +625,20 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
 
         database.child("StarredMessage").child(channelname).addValueEventListener(new ValueEventListener()
         {
-            String[] values;
-
-
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
-                int i = 0;
-                values = new String[(int) dataSnapshot.getChildrenCount()];
+                StarredMessageAdapter adapter;
+                starredMessageList.clear();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren())
                 {
-                    Log.d("hello", postSnapshot.getValue().toString());
-                    values[i] = postSnapshot.getValue().toString() + "\n" + formattedTimeFrom(postSnapshot.getKey());
-                    i++;
+                    StarredMessage starredMessage = postSnapshot.getValue(StarredMessage.class);
+                    starredMessageList.add(starredMessage);
                 }
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(ChatActivity.this,
-                        android.R.layout.simple_list_item_1, android.R.id.text1, values);
-                starredmessagelist.setAdapter(adapter);
+                adapter = new StarredMessageAdapter(starredMessageList);
+                starredmessagerecycler.setHasFixedSize(true);
+                starredmessagerecycler.setLayoutManager(new LinearLayoutManager(ChatActivity.this));
+                starredmessagerecycler.setAdapter(adapter);
             }
 
             @Override
@@ -709,6 +785,9 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth)
     {
+        this.day=dayOfMonth;
+        this.month=monthOfYear;
+        this.year=year;
         Calendar now = Calendar.getInstance();
         com.wdullaer.materialdatetimepicker.time.TimePickerDialog dpd = com.wdullaer.materialdatetimepicker.time.TimePickerDialog.newInstance(
                 ChatActivity.this,
@@ -728,13 +807,26 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
         dialog.setContentView(R.layout.edittextpopup);
         final EditText text = (EditText) dialog.findViewById(R.id.edit_text);
         Button button = (Button) dialog.findViewById(R.id.post_button);
+
+        String myDate = year+"/"+(month+1)+"/"+day+" "+hourOfDay+":"+minute+":"+0;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = null;
+        try
+        {
+            date = sdf.parse(myDate);
+        } catch (ParseException e)
+        {
+            e.printStackTrace();
+        }
+        final long millis = date.getTime();
+
         button.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                Notification notification = new Notification(text.getText().toString(),hourOfDay,minute);
-                database.child("TODO").child(channelname).push().setValue(notification);
+                Notification notification = new Notification(text.getText().toString(), hourOfDay, minute,day,month,year,Long.toString(millis), username);
+                database.child("Notification").child(channelname).push().setValue(notification);
                 dialog.dismiss();
             }
         });

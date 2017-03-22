@@ -4,6 +4,9 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.StrictMode;
@@ -47,7 +50,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>
     String channelname, userid;
     String directorypath;
 
-    MyAdapter(List<Files> info, String directorypath, String channelname, String userid)
+    public MyAdapter(List<Files> info, String directorypath, String channelname, String userid)
     {
         this.info = info;
         this.directorypath = directorypath;
@@ -71,9 +74,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>
         Files file = info.get(position);
         holder.filename.setText(file.getFilename());
         if (file.getDirectory())
-            Glide.with(context).load("").placeholder(R.drawable.ic_arrow_back).into(holder.fileimage);
+            Glide.with(context).load("").placeholder(R.drawable.ic_action_folder_closed).into(holder.fileimage);
         else
-            Glide.with(context).load("").placeholder(R.drawable.ic_person_add).into(holder.fileimage);
+            Glide.with(context).load("").placeholder(R.drawable.ic_insert_drive_file).into(holder.fileimage);
 
     }
 
@@ -94,6 +97,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>
             super(itemView);
             fileimage = (ImageView) itemView.findViewById(R.id.file_image);
             filename = (TextView) itemView.findViewById(R.id.filename);
+            fileimage.setColorFilter(ContextCompat.getColor(context,R.color.colorPrimary));
             itemView.setOnClickListener(this);
         }
 

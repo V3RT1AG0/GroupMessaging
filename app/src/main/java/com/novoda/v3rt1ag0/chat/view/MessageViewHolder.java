@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.novoda.v3rt1ag0.R;
+import com.novoda.v3rt1ag0.chat.Model.StarredMessage;
 import com.novoda.v3rt1ag0.chat.data.model.Chat;
 import com.novoda.v3rt1ag0.chat.data.model.Message;
 
@@ -42,8 +43,10 @@ public class MessageViewHolder extends RecyclerView.ViewHolder
                         String starredmessage =message.getBody();
                         long date=message.getTimestamp();
                         String author=message.getAuthor().getName();
-                        database.child("StarredMessage").child(channelname).child(String.valueOf(date)).setValue(starredmessage+"\n"+author);
+                        StarredMessage starredMessage=new StarredMessage(starredmessage,Long.toString(date),author);
+                        //database.child("StarredMessage").child(channelname).child(String.valueOf(date)).setValue(starredmessage+"\n"+author);
                         // Toast.makeText(messageView.getContext(),chat.get(getAdapterPosition()).getBody(),Toast.LENGTH_LONG).show();
+                        database.child("StarredMessage").child(channelname).push().setValue(starredMessage);
                         dialog.dismiss();
                     }
                 });
