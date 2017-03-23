@@ -114,6 +114,8 @@
                         android:paddingStart="8dp">
 
                         <LinearLayout
+                            android:id="@+id/LLstar"
+                            android:visibility="gone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
@@ -133,6 +135,8 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:id="@+id/LLnote"
+                            android:visibility="gone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
@@ -152,6 +156,8 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:id="@+id/LLtodo"
+                            android:visibility="gone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
@@ -171,6 +177,8 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:id="@+id/LLnoti"
+                            android:visibility="gone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
@@ -189,6 +197,8 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:id="@+id/LLfile"
+                            android:visibility="gone"
                             android:layout_marginTop="10dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

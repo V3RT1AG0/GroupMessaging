@@ -1,6 +1,8 @@
 package com.novoda.v3rt1ag0.chat.Adapters;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +13,11 @@ import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.novoda.v3rt1ag0.R;
 import com.novoda.v3rt1ag0.chat.MillisToDateTimeStringFormat;
 import com.novoda.v3rt1ag0.chat.Model.StarredMessage;
@@ -25,10 +32,12 @@ public class StarredMessageAdapter extends RecyclerView.Adapter<StarredMessageAd
 {
     List<StarredMessage> info;
     Context context;
+    String channelname;
 
-    public StarredMessageAdapter(List<StarredMessage> info)
+    public StarredMessageAdapter(List<StarredMessage> info,String channelname)
     {
         this.info=info;
+        this.channelname=channelname;
     }
 
     @Override
@@ -61,6 +70,7 @@ public class StarredMessageAdapter extends RecyclerView.Adapter<StarredMessageAd
 
         TextView username,date,message;
         LinearLayout hiddenlinearlayout;
+
         public MyViewHolder(View itemView)
         {
             super(itemView);
@@ -68,7 +78,56 @@ public class StarredMessageAdapter extends RecyclerView.Adapter<StarredMessageAd
             date= (TextView) itemView.findViewById(R.id.date);
             message= (TextView) itemView.findViewById(R.id.message);
             hiddenlinearlayout= (LinearLayout) itemView.findViewById(R.id.fadelinearlayout);
-            message.setOnClickListener(this);
+            CardView cardView= (CardView) itemView.findViewById(R.id.cardview);
+            cardView.setOnLongClickListener(new View.OnLongClickListener()
+            {
+            @Override
+            public boolean onLongClick(View v)
+            {
+                Log.d("Tag","hello");
+                final Dialog dialog = new Dialog(v.getContext());
+                dialog.setContentView(R.layout.popup_dialog);
+                TextView text = (TextView) dialog.findViewById(R.id.star);
+                text.setText("Delete");
+                text.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View view)
+                    {
+                        final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                        database.child("StarredMessage").child(channelname).addValueEventListener(new ValueEventListener()
+                        {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot)
+                            {
+
+                                for (DataSnapshot postSnapshot : dataSnapshot.getChildren())
+                                {
+                                   //Log.d("hello",getAdapterPosition()+"");
+                                   //Log.d("tag","helloasd"+postSnapshot.child("timeinmillis").getValue()+",,"+info.get(getAdapterPosition()).getTimeinmillis());
+                                    if (postSnapshot.child("timeinmillis").getValue()==info.get(getAdapterPosition()).getTimeinmillis())
+                                    {
+                                        database.child("StarredMessage").child(channelname).removeEventListener(this);
+                                        postSnapshot.getRef().removeValue();
+                                        break;
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError)
+                            {
+
+                            }
+                        });
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+
+                return true;
+            }});
+           cardView.setOnClickListener(this);
         }
 
         @Override
@@ -76,7 +135,7 @@ public class StarredMessageAdapter extends RecyclerView.Adapter<StarredMessageAd
         {
             switch (view.getId())
             {
-                case R.id.message:
+                case R.id.cardview:
                     Animation fadein= AnimationUtils.loadAnimation(view.getContext(),
                             R.anim.fade_in);
                     hiddenlinearlayout.startAnimation(fadein);
@@ -85,6 +144,8 @@ public class StarredMessageAdapter extends RecyclerView.Adapter<StarredMessageAd
                 break;
             }
         }
+
+
     }
 }
 

@@ -1,8 +1,11 @@
 package com.novoda.v3rt1ag0.chat.Adapters;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Paint;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +16,11 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.novoda.v3rt1ag0.R;
 import com.novoda.v3rt1ag0.chat.MillisToDateTimeStringFormat;
 import com.novoda.v3rt1ag0.chat.Model.TODO;
@@ -77,7 +84,56 @@ public class TODOadapter extends RecyclerView.Adapter<TODOadapter.MyViewHolder>
             message = (TextView) itemView.findViewById(R.id.message);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkbox);
             hiddenlinearlayout= (LinearLayout) itemView.findViewById(R.id.fadelinearlayout);
-            message.setOnClickListener(this);
+            CardView cardView= (CardView) itemView.findViewById(R.id.cardview);
+            cardView.setOnLongClickListener(new View.OnLongClickListener()
+            {
+                @Override
+                public boolean onLongClick(View v)
+                {
+                    Log.d("Tag","hello");
+                    final Dialog dialog = new Dialog(v.getContext());
+                    dialog.setContentView(R.layout.popup_dialog);
+                    TextView text = (TextView) dialog.findViewById(R.id.star);
+                    text.setText("Delete");
+                    text.setOnClickListener(new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View view)
+                        {
+                            final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                            database.child("TODO").child(channelname).addValueEventListener(new ValueEventListener()
+                            {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot)
+                                {
+
+                                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren())
+                                    {
+                                        Log.d("hello",getAdapterPosition()+"");
+                                        Log.d("tag","helloasd"+postSnapshot.child("timestamp").getValue()+",,"+info.get(getAdapterPosition()).getTimestamp());
+                                        if (postSnapshot.child("timestamp").getValue()==info.get(getAdapterPosition()).getTimestamp())
+                                        {
+                                            database.child("TODO").child(channelname).removeEventListener(this);
+                                            postSnapshot.getRef().removeValue();
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError)
+                                {
+
+                                }
+                            });
+                            dialog.dismiss();
+                        }
+                    });
+                    dialog.show();
+
+                    return true;
+                }});
+            cardView.setOnClickListener(this);
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
             {
                 @Override
@@ -97,7 +153,7 @@ public class TODOadapter extends RecyclerView.Adapter<TODOadapter.MyViewHolder>
         {
             switch (view.getId())
             {
-                case R.id.message:
+                case R.id.cardview:
                     Animation fadein= AnimationUtils.loadAnimation(view.getContext(),
                             R.anim.fade_in);
                     hiddenlinearlayout.startAnimation(fadein);

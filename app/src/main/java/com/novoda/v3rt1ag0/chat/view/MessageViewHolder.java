@@ -33,6 +33,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder
                 final Dialog dialog = new Dialog(v.getContext());
                 dialog.setContentView(R.layout.popup_dialog);
                 TextView text = (TextView) dialog.findViewById(R.id.star);
+                text.setText("Star");
                 text.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
