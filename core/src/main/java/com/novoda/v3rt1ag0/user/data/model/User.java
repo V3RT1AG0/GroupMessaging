@@ -5,15 +5,17 @@ public class User {
     private String id;
     private String name;
     private String photoUrl;
+    private String firebasetoken;
 
     @SuppressWarnings("unused") //Used by Firebase
     public User() {
     }
 
-    public User(String id, String name, String photoUrl) {
+    public User(String id, String name, String photoUrl,String firebasetoken) {
         this.id = id;
         this.name = name;
         this.photoUrl = photoUrl;
+        this.firebasetoken=firebasetoken;
     }
 
     public String getId() {
@@ -26,6 +28,11 @@ public class User {
 
     public String getPhotoUrl() {
         return photoUrl;
+    }
+
+    public String getFirebasetoken()
+    {
+        return firebasetoken;
     }
 
     @Override

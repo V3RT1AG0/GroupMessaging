@@ -64,6 +64,8 @@ import com.novoda.v3rt1ag0.chat.presenter.ChatPresenter;
 import com.novoda.v3rt1ag0.navigation.AndroidNavigator;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
+import com.google.firebase.iid.FirebaseInstanceIdService;
+
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.text.DateFormat;
@@ -113,26 +115,10 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
 
     public void adminmode(int enabled)
     {
+        Log.d("tag",""+enabled);
         adminMode.setAdminmode(enabled);
         adminMode.setChannelname(channelname);
         database.child("adminCheck").child(channelname).setValue(adminMode);
-        database.child("Admin").child(channelname).addValueEventListener(new ValueEventListener()
-        {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                adminMode.setOwner(dataSnapshot.getValue());
-                database.child("adminCheck").child(channelname).setValue(adminMode);
-                //  database.child("adminCheck").push().setValue(adminMode);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error)
-            {
-
-            }
-        });
-
     }
 
     @Override
@@ -162,7 +148,6 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
         todoList = new ArrayList<>();
         fileslist = new ArrayList<>();
         notificationList = new ArrayList<>();
-
 
         ImageView file_chooser = (ImageView) findViewById(R.id.uploadfile);
         ImageView imageView = (ImageView) findViewById(R.id.open_all_files);
@@ -300,7 +285,11 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
             }
         });
 
+
+
+
         admin_switch.setOnCheckedChangeListener(this);
+
         getUsername();
         checkAdminEnabled();
         setListViewForStarred();
@@ -323,6 +312,25 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
                 new AndroidNavigator(this),
                 Dependencies.INSTANCE.getErrorLogger()
         );
+
+
+        database.child("Admin").child(channelname).addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                adminMode.setOwner(dataSnapshot.getValue());
+                database.child("adminCheck").child(channelname).setValue(adminMode);
+                //  database.child("adminCheck").push().setValue(adminMode);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error)
+            {
+
+            }
+        });
+
 
     }
 
@@ -347,6 +355,7 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
                 }
                 MyAdapter myAdapter = new MyAdapter(fileslist,"FileStorage/" + channelname,channelname,userid);
                 filemanagerrecycler.setHasFixedSize(true);
+                filemanagerrecycler.setNestedScrollingEnabled(false);
                 filemanagerrecycler.setLayoutManager(new LinearLayoutManager(ChatActivity.this));
                 filemanagerrecycler.setAdapter(myAdapter);
             }
@@ -672,6 +681,7 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
+
                 Log.d("hello", channelname);
                 try
                 {
@@ -705,18 +715,17 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
                             admin_switch.setEnabled(true);
                             messagelayout.setVisibility(View.VISIBLE);
                             chatDisplayer.showAddMembersButton();
-                            Log.d("custom", userid);
+                            Log.d("custom", userid+" "+postSnapshot.getKey());
                             break;
                         } else
                         {
-
+                            chatDisplayer.hideAddMembersButton();
                             admin_switch.setEnabled(false);
                             Log.d("custom2", userid);
                         }
                         // Log.d("hello",postSnapshot.getKey());
                     }
                 }
-
 
             }
 

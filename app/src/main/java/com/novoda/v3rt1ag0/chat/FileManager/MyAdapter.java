@@ -1,5 +1,6 @@
 package com.novoda.v3rt1ag0.chat.FileManager;
 
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -49,6 +51,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>
     Context context;
     String channelname, userid;
     String directorypath;
+    Handler handler;
 
     public MyAdapter(List<Files> info, String directorypath, String channelname, String userid)
     {
@@ -56,6 +59,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>
         this.directorypath = directorypath;
         this.channelname = channelname;
         this.userid = userid;
+        handler=new Handler();
     }
 
     @Override
@@ -112,8 +116,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>
                         view.getContext().startActivity(new Intent(view.getContext(), MainActivity.class).putExtra("channel", channelname).putExtra("uid", userid).putExtra("directorypath", directorypath + "/" + info.get(getAdapterPosition()).getFilename() + "dir"));
                     } else
                     {
+                        //ProgressDialog progressDialog = new ProgressDialog(context);
+                        //progressDialog.setTitle("Downloading");
+                        //progressDialog.show();
                         //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                         //StrictMode.setThreadPolicy(policy);
+                        Toast.makeText(context,"Downloading",Toast.LENGTH_LONG).show();
                         new Thread(new Runnable()
                         {
                             @Override
@@ -189,6 +197,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>
         File file = null;
         try
         {
+            //ProgressDialog progressDialog = new ProgressDialog(context);
+            //progressDialog.setTitle("Uploading");
 
             String extStorageDirectory = Environment.getExternalStorageDirectory()
                     .toString();
@@ -213,6 +223,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>
             int count=0;
 
             while ((count = input.read(data)) != -1) {
+
+                double progress = (100.0 * count / lenghtOfFile);
+
+                //displaying percentage in progress dialog
+               // progressDialog.setMessage("Uploaded " + ((int) progress) + "%...");
                 Log.d("count", String.valueOf(total));
                 total += count;
                 output.write(data, 0, count);
@@ -224,12 +239,17 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>
             // closing streams
             output.close();
             input.close();
+           // progressDialog.dismiss();
         } catch (Exception e)
         {
             e.printStackTrace();
         }
         return file;
     }
+    private void runOnUiThread(Runnable runnable) {
+        handler.post(runnable);
+    }
+
 
 
 }

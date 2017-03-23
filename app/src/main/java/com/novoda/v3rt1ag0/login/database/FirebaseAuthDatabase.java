@@ -2,6 +2,7 @@ package com.novoda.v3rt1ag0.login.database;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -10,6 +11,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.novoda.v3rt1ag0.login.data.model.Authentication;
 import com.novoda.v3rt1ag0.user.data.model.User;
 
@@ -63,7 +65,8 @@ public class FirebaseAuthDatabase implements AuthDatabase {
 
     private Authentication authenticationFrom(FirebaseUser currentUser) {
         Uri photoUrl = currentUser.getPhotoUrl();
-        return new Authentication(new User(currentUser.getUid(), currentUser.getDisplayName(), photoUrl == null ? "" : photoUrl.toString()));
+        Log.d("firebase", FirebaseInstanceId.getInstance().getToken()+"     "+currentUser.getUid());
+        return new Authentication(new User(currentUser.getUid(), currentUser.getDisplayName(), photoUrl == null ? "" : photoUrl.toString(), FirebaseInstanceId.getInstance().getToken()));
     }
 
 }

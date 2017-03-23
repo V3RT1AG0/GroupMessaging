@@ -16,6 +16,7 @@
             <include layout="@layout/toolbar_inverted_layout"/>
 
             <android.support.v7.widget.RecyclerView
+                android:layout_marginTop="?android:attr/actionBarSize"
                 android:id="@+id/messages_recycler_view"
                 style="@style/Chat.RecyclerView"
                 android:layout_width="match_parent"
@@ -65,7 +66,8 @@
             android:layout_gravity="right|end"
             android:layout_marginEnd="-64dp"
             android:layout_marginRight="-64dp"
-            android:background="@color/background_grey">
+            android:background="@color/background_grey"
+            android:clickable="true">
 
 
             <ScrollView
@@ -187,8 +189,10 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:layout_marginTop="10dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:paddingBottom="20dp"
                             android:orientation="vertical">
 
                             <RelativeLayout
@@ -203,12 +207,12 @@
                                     android:textSize="15sp"/>
 
                                 <ImageView
-                                    android:layout_alignParentEnd="true"
-                                    android:tint="@color/colorPrimary"
                                     android:id="@+id/open_all_files"
                                     android:layout_width="25dp"
                                     android:layout_height="25dp"
-                                    android:src="@drawable/ic_keyboard_arrow_right"/>
+                                    android:layout_alignParentEnd="true"
+                                    android:src="@drawable/ic_keyboard_arrow_right"
+                                    android:tint="@color/colorPrimary"/>
 
                             </RelativeLayout>
 
@@ -239,6 +243,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:background="@color/white"
+                android:clickable="true"
                 android:orientation="vertical"
                 android:visibility="gone">
 

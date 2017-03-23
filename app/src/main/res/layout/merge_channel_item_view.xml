@@ -3,21 +3,23 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:layout_margin="3dp"
+    android:padding="7dp"
+    android:elevation="1dp">
 
-<TextView
-    style="@style/Channels.Name"
-android:id="@+id/channel_title"
-android:layout_width="match_parent"
-android:layout_height="wrap_content"/>
+    <TextView
+        android:textSize="20sp"
+        android:id="@+id/channel_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
-<ImageView
-
-    android:visibility="gone"
-android:id="@+id/lock_icon"
-android:layout_width="@dimen/channel_item_lock_icon_size"
-android:layout_height="@dimen/channel_item_lock_icon_size"
-android:src="@drawable/ic_lock_white"/>
+    <ImageView
+        android:id="@+id/lock_icon"
+        android:layout_width="@dimen/channel_item_lock_icon_size"
+        android:layout_height="@dimen/channel_item_lock_icon_size"
+        android:src="@drawable/ic_lock_white"
+        android:visibility="gone"/>
 
 </LinearLayout>

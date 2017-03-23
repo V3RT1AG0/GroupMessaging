@@ -1,12 +1,16 @@
 package com.novoda.v3rt1ag0.chat.Adapters;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.database.FirebaseDatabase;
@@ -63,6 +67,7 @@ public class TODOadapter extends RecyclerView.Adapter<TODOadapter.MyViewHolder>
 
         TextView username, date, message;
         CheckBox checkBox;
+        LinearLayout hiddenlinearlayout;
 
         public MyViewHolder(View itemView)
         {
@@ -71,12 +76,18 @@ public class TODOadapter extends RecyclerView.Adapter<TODOadapter.MyViewHolder>
             date = (TextView) itemView.findViewById(R.id.date);
             message = (TextView) itemView.findViewById(R.id.message);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkbox);
+            hiddenlinearlayout= (LinearLayout) itemView.findViewById(R.id.fadelinearlayout);
+            message.setOnClickListener(this);
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
             {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
                 {
                     FirebaseDatabase.getInstance().getReference().child("TODO").child(channelname).child(info.get(getAdapterPosition()).getKey()).child("checked").setValue(isChecked);
+                    if(isChecked)
+                    {
+                        message.setPaintFlags(message.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    }
                 }
             });
         }
@@ -86,7 +97,12 @@ public class TODOadapter extends RecyclerView.Adapter<TODOadapter.MyViewHolder>
         {
             switch (view.getId())
             {
-
+                case R.id.message:
+                    Animation fadein= AnimationUtils.loadAnimation(view.getContext(),
+                            R.anim.fade_in);
+                    hiddenlinearlayout.startAnimation(fadein);
+                    hiddenlinearlayout.setVisibility(View.VISIBLE);
+                    view.setOnClickListener(null);
             }
         }
     }

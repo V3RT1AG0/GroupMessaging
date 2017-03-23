@@ -6,6 +6,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.novoda.v3rt1ag0.R;
@@ -57,12 +60,15 @@ public class StarredMessageAdapter extends RecyclerView.Adapter<StarredMessageAd
     {
 
         TextView username,date,message;
+        LinearLayout hiddenlinearlayout;
         public MyViewHolder(View itemView)
         {
             super(itemView);
             username= (TextView) itemView.findViewById(R.id.name);
             date= (TextView) itemView.findViewById(R.id.date);
             message= (TextView) itemView.findViewById(R.id.message);
+            hiddenlinearlayout= (LinearLayout) itemView.findViewById(R.id.fadelinearlayout);
+            message.setOnClickListener(this);
         }
 
         @Override
@@ -70,7 +76,13 @@ public class StarredMessageAdapter extends RecyclerView.Adapter<StarredMessageAd
         {
             switch (view.getId())
             {
-
+                case R.id.message:
+                    Animation fadein= AnimationUtils.loadAnimation(view.getContext(),
+                            R.anim.fade_in);
+                    hiddenlinearlayout.startAnimation(fadein);
+                    hiddenlinearlayout.setVisibility(View.VISIBLE);
+                    view.setOnClickListener(null);
+                break;
             }
         }
     }

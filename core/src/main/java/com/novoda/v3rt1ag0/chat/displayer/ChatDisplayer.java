@@ -19,6 +19,8 @@ public interface ChatDisplayer {
 
     void disableInteraction();
 
+    void hideAddMembersButton();
+
     interface ChatActionListener {
 
         void onUpPressed();

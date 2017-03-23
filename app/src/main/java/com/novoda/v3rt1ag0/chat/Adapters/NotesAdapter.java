@@ -5,6 +5,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.novoda.v3rt1ag0.R;
@@ -24,7 +27,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
 
     public NotesAdapter(List<Note> info)
     {
-        this.info=info;
+        this.info = info;
     }
 
     @Override
@@ -32,7 +35,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
     {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card_starred_message, parent, false);
-        context=parent.getContext();
+        context = parent.getContext();
         MyViewHolder pvh = new MyViewHolder(v);
         return pvh;
     }
@@ -40,7 +43,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position)
     {
-        Note in=info.get(position);
+        Note in = info.get(position);
         holder.message.setText(in.getContent());
         holder.username.setText(in.getEditedby());
         holder.date.setText(MillisToDateTimeStringFormat.formattedTimeFrom(in.getTimestamp()));
@@ -55,13 +58,17 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
 
-        TextView username,date,message;
+        TextView username, date, message;
+        LinearLayout hiddenlinearlayout;
+
         public MyViewHolder(View itemView)
         {
             super(itemView);
-            username= (TextView) itemView.findViewById(R.id.name);
-            date= (TextView) itemView.findViewById(R.id.date);
-            message= (TextView) itemView.findViewById(R.id.message);
+            username = (TextView) itemView.findViewById(R.id.name);
+            date = (TextView) itemView.findViewById(R.id.date);
+            message = (TextView) itemView.findViewById(R.id.message);
+            hiddenlinearlayout = (LinearLayout) itemView.findViewById(R.id.fadelinearlayout);
+            message.setOnClickListener(this);
         }
 
         @Override
@@ -69,7 +76,12 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
         {
             switch (view.getId())
             {
-
+                case R.id.message:
+                    Animation fadein = AnimationUtils.loadAnimation(view.getContext(),
+                            R.anim.fade_in);
+                    hiddenlinearlayout.startAnimation(fadein);
+                    hiddenlinearlayout.setVisibility(View.VISIBLE);
+                    view.setOnClickListener(null);
             }
         }
     }

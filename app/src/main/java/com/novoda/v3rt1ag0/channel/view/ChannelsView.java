@@ -42,7 +42,7 @@ public class ChannelsView extends LinearLayout implements ChannelsDisplayer {
         newChannelFab = Views.findById(this, R.id.new_channel_fab);
         toolbar = Views.findById(this, R.id.toolbar);
         toolbar.setTitle(R.string.app_name);
-        toolbar.inflateMenu(R.menu.channels_menu);
+       // toolbar.inflateMenu(R.menu.channels_menu);
     }
 
     private int getSpanCount() {

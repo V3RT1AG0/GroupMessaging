@@ -20,7 +20,7 @@ class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
     private static final int VIEW_TYPE_MESSAGE_THIS_USER = 0;
     private static final int VIEW_TYPE_MESSAGE_OTHER_USERS = 1;
     private Chat chat = new Chat(new ArrayList<Message>());
-    private User user = new User("", "", "");
+    private User user = new User("", "", "","");
     private final LayoutInflater inflater;
 
     ChatAdapter(LayoutInflater inflater) {

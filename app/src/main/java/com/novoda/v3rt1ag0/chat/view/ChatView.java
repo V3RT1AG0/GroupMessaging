@@ -3,7 +3,6 @@ package com.novoda.v3rt1ag0.chat.view;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -95,6 +94,7 @@ public class ChatView extends LinearLayout implements ChatDisplayer
         toolbar.getMenu().findItem(R.id.manageOwners).setVisible(true);
     }
 
+
     @Override
     public void display(Chat chat, User user)
     {
@@ -115,6 +115,13 @@ public class ChatView extends LinearLayout implements ChatDisplayer
     {
         submitButton.setEnabled(false);
         submitButton.setColorFilter(getResources().getColor(R.color.disabled_grey), PorterDuff.Mode.SRC_ATOP);
+    }
+
+    @Override
+    public void hideAddMembersButton()
+    {
+
+            toolbar.getMenu().findItem(R.id.manageOwners).setVisible(false);
     }
 
     private final TextWatcher textWatcher = new TextWatcher()
