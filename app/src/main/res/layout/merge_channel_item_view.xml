@@ -3,13 +3,20 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:background="@color/white"
     android:layout_margin="3dp"
     android:padding="7dp"
-    android:elevation="1dp">
+    android:elevation="1dp"
+    android:gravity="center_vertical">
+
+    <ImageView
+        android:src="@drawable/contacts"
+        android:layout_width="50dp"
+        android:layout_height="50dp"/>
 
     <TextView
+        android:layout_marginStart="10dp"
         android:textSize="20sp"
         android:id="@+id/channel_title"
         android:layout_width="match_parent"

@@ -9,17 +9,19 @@ public class Note
     String timestamp;
     String content;
     String editedby;
+    String body;
 
     Note()
     {
 
     }
 
-    public Note(String timestamp, String content, String editedby)
+    public Note(String timestamp, String content, String editedby,String body)
     {
         this.timestamp=timestamp;
         this.content=content;
         this.editedby=editedby;
+        this.body=body;
     }
 
     public String getContent()
@@ -35,5 +37,10 @@ public class Note
     public String getEditedby()
     {
         return editedby;
+    }
+
+    public String getBody()
+    {
+        return body;
     }
 }

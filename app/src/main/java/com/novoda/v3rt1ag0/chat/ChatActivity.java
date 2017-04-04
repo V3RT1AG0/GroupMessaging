@@ -260,15 +260,29 @@ public class ChatActivity extends BaseActivity implements CompoundButton.OnCheck
                 final Dialog dialog = new Dialog(v.getContext());
                 dialog.setContentView(R.layout.edittextpopup);
                 final EditText text = (EditText) dialog.findViewById(R.id.edit_text);
-                Button button = (Button) dialog.findViewById(R.id.post_button);
+                text.setHint("Enter title");
+                final Button button = (Button) dialog.findViewById(R.id.post_button);
                 button.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
                     public void onClick(View v)
                     {
-                        Note note = new Note(Long.toString(System.currentTimeMillis()), text.getText().toString(), username);
-                        database.child("Notes").child(channelname).push().setValue(note);
+                        final String title= text.getText().toString();
+                        text.setText("");
+                        text.setHint("Enter content");
                         dialog.dismiss();
+                        dialog.show();
+                        button.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v)
+                            {
+                                String body=text.getText().toString();
+                                Note note = new Note(Long.toString(System.currentTimeMillis()), title, username,body);
+                                database.child("Notes").child(channelname).push().setValue(note);
+                                dialog.dismiss();
+                            }
+                        });
+
                     }
                 });
                 dialog.show();

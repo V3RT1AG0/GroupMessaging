@@ -66,18 +66,15 @@
             android:layout_gravity="right|end"
             android:layout_marginEnd="-64dp"
             android:layout_marginRight="-64dp"
-            android:background="@color/background_grey"
+            android:background="#CCFFFFFF"
             android:clickable="true">
 
 
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/background_grey"
                     android:orientation="vertical">
 
                     <LinearLayout
@@ -106,26 +103,39 @@
                             android:paddingStart="5dp"/>
                     </LinearLayout>
 
+                    <ScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:paddingEnd="8dp"
-                        android:paddingStart="8dp">
+                       >
 
                         <LinearLayout
+
+
                             android:id="@+id/LLstar"
                             android:visibility="gone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:orientation="vertical">
+                            android:background="#B3FFFFFF"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:layout_marginBottom="2dp"
+                            android:orientation="vertical"
+                            android:paddingEnd="8dp"
+                            android:paddingStart="8dp">
 
                             <TextView
+
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="Starred"
-                                android:textSize="15sp"/>
+                                android:textSize="15sp"
+                                android:layout_marginBottom="5dp"
+                                android:textColor="@color/colorAccent"/>
 
                             <android.support.v7.widget.RecyclerView
                                 android:id="@+id/starredRecycler"
@@ -139,10 +149,17 @@
                             android:visibility="gone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:orientation="vertical">
+                            android:background="#B3FFFFFF"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:layout_marginBottom="2dp"
+                            android:orientation="vertical"
+                            android:paddingEnd="8dp"
+                            android:paddingStart="8dp">
 
                             <TextView
+                                android:layout_marginBottom="5dp"
+                                android:textColor="@color/colorAccent"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="Notes"
@@ -156,14 +173,21 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:paddingEnd="8dp"
+                            android:paddingStart="8dp"
                             android:id="@+id/LLtodo"
                             android:visibility="gone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
+                            android:background="#B3FFFFFF"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:layout_marginBottom="2dp"
                             android:orientation="vertical">
 
                             <TextView
+                                android:layout_marginBottom="5dp"
+                                android:textColor="@color/colorAccent"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="TODO"
@@ -177,14 +201,22 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:paddingEnd="8dp"
+                            android:paddingStart="8dp"
+                            android:textColor="@color/colorAccent"
                             android:id="@+id/LLnoti"
                             android:visibility="gone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
+                            android:background="#B3FFFFFF"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:layout_marginBottom="2dp"
                             android:orientation="vertical">
 
                             <TextView
+                                android:layout_marginBottom="5dp"
+                                android:textColor="@color/colorAccent"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="Notification"
@@ -197,9 +229,13 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:paddingEnd="8dp"
+                            android:paddingStart="8dp"
                             android:id="@+id/LLfile"
                             android:visibility="gone"
-                            android:layout_marginTop="10dp"
+                            android:background="#B3FFFFFF"
+                            android:paddingTop="10dp"
+                            android:layout_marginBottom="2dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:paddingBottom="20dp"
@@ -211,6 +247,8 @@
                                 android:gravity="center_vertical">
 
                                 <TextView
+                                    android:layout_marginBottom="5dp"
+                                    android:textColor="@color/colorAccent"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="Files"
@@ -234,9 +272,10 @@
 
                         </LinearLayout>
                     </LinearLayout>
+                    </ScrollView>
 
                 </LinearLayout>
-            </ScrollView>
+
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/show_hide_image"

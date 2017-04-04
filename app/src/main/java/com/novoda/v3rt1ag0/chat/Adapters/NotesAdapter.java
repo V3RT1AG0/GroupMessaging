@@ -44,7 +44,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.card_starred_message, parent, false);
+                .inflate(R.layout.card_notes, parent, false);
         context = parent.getContext();
         MyViewHolder pvh = new MyViewHolder(v);
         return pvh;
@@ -57,6 +57,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
         holder.message.setText(in.getContent());
         holder.username.setText(in.getEditedby());
         holder.date.setText(MillisToDateTimeStringFormat.formattedTimeFrom(in.getTimestamp()));
+        holder.messagecontent.setText(in.getBody());
     }
 
     @Override
@@ -68,7 +69,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
 
-        TextView username, date, message;
+        TextView username, date, message,messagecontent;
         LinearLayout hiddenlinearlayout;
 
         public MyViewHolder(View itemView)
@@ -77,6 +78,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
             username = (TextView) itemView.findViewById(R.id.name);
             date = (TextView) itemView.findViewById(R.id.date);
             message = (TextView) itemView.findViewById(R.id.message);
+            messagecontent= (TextView) itemView.findViewById(R.id.messagecontent);
             hiddenlinearlayout = (LinearLayout) itemView.findViewById(R.id.fadelinearlayout);
             CardView cardView= (CardView) itemView.findViewById(R.id.cardview);
             cardView.setOnLongClickListener(new View.OnLongClickListener()
@@ -136,11 +138,21 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
             switch (view.getId())
             {
                 case R.id.cardview:
-                    Animation fadein = AnimationUtils.loadAnimation(view.getContext(),
-                            R.anim.fade_in);
-                    hiddenlinearlayout.startAnimation(fadein);
-                    hiddenlinearlayout.setVisibility(View.VISIBLE);
-                    view.setOnClickListener(null);
+                    if(hiddenlinearlayout.getVisibility()==View.GONE)
+                    {
+                        Animation fadein = AnimationUtils.loadAnimation(view.getContext(),
+                                R.anim.fade_in);
+                        hiddenlinearlayout.startAnimation(fadein);
+                        hiddenlinearlayout.setVisibility(View.VISIBLE);
+                        //view.setOnClickListener(null);
+                    }
+                    else
+                    {
+                        Animation fadeout = AnimationUtils.loadAnimation(view.getContext(),
+                                R.anim.fade_out);
+                        hiddenlinearlayout.startAnimation(fadeout);
+                        hiddenlinearlayout.setVisibility(View.GONE);
+                    }
             }
         }
     }

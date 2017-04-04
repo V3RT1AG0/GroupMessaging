@@ -76,11 +76,21 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             switch (view.getId())
             {
                 case R.id.message:
-                    Animation fadein= AnimationUtils.loadAnimation(view.getContext(),
-                            R.anim.fade_in);
-                    hiddenlinearlayout.startAnimation(fadein);
-                    hiddenlinearlayout.setVisibility(View.VISIBLE);
-                    view.setOnClickListener(null);
+                    if(hiddenlinearlayout.getVisibility()==View.GONE)
+                    {
+                        Animation fadein = AnimationUtils.loadAnimation(view.getContext(),
+                                R.anim.fade_in);
+                        hiddenlinearlayout.startAnimation(fadein);
+                        hiddenlinearlayout.setVisibility(View.VISIBLE);
+                        //view.setOnClickListener(null);
+                    }
+                    else
+                    {
+                        Animation fadeout = AnimationUtils.loadAnimation(view.getContext(),
+                                R.anim.fade_out);
+                        hiddenlinearlayout.startAnimation(fadeout);
+                        hiddenlinearlayout.setVisibility(View.GONE);
+                    }
             }
         }
     }

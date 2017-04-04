@@ -136,11 +136,21 @@ public class StarredMessageAdapter extends RecyclerView.Adapter<StarredMessageAd
             switch (view.getId())
             {
                 case R.id.cardview:
-                    Animation fadein= AnimationUtils.loadAnimation(view.getContext(),
-                            R.anim.fade_in);
-                    hiddenlinearlayout.startAnimation(fadein);
-                    hiddenlinearlayout.setVisibility(View.VISIBLE);
-                    view.setOnClickListener(null);
+                    if(hiddenlinearlayout.getVisibility()==View.GONE)
+                    {
+                        Animation fadein = AnimationUtils.loadAnimation(view.getContext(),
+                                R.anim.fade_in);
+                        hiddenlinearlayout.startAnimation(fadein);
+                        hiddenlinearlayout.setVisibility(View.VISIBLE);
+                        //view.setOnClickListener(null);
+                    }
+                    else
+                    {
+                        Animation fadeout = AnimationUtils.loadAnimation(view.getContext(),
+                                R.anim.fade_out);
+                        hiddenlinearlayout.startAnimation(fadeout);
+                        hiddenlinearlayout.setVisibility(View.GONE);
+                    }
                 break;
             }
         }
